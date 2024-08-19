@@ -3,6 +3,7 @@ from constants import *
 from player import Player
 from asteroid import Asteroid
 from asteroidfield import AsteroidField
+from shot import Shot
 
 def main():
     print("Starting asteroids!")
@@ -14,12 +15,14 @@ def runGame():
     print(f"Screen width: {SCREEN_WIDTH}")
     print(f"Screen height: {SCREEN_HEIGHT}")
 
-    updatable = pygame.sprite.Group()
-    drawable = pygame.sprite.Group()
-    asteroid = pygame.sprite.Group()
-    Player.containers = (updatable, drawable)
-    Asteroid.containers = (updatable, drawable, asteroid)
-    AsteroidField.containers = (updatable)
+    updatables = pygame.sprite.Group()
+    drawables = pygame.sprite.Group()
+    asteroids = pygame.sprite.Group()
+    shots = pygame.sprite.Group()
+    Player.containers = (updatables, drawables)
+    Asteroid.containers = (updatables, drawables, asteroids)
+    AsteroidField.containers = (updatables)
+    Shot.containers = (updatables, drawables, shots)
 
     asteroid_field = AsteroidField()
     clock = pygame.time.Clock()
@@ -34,17 +37,21 @@ def runGame():
             if event.type == pygame.QUIT:
                 return
             
-        for object in updatable:
-            object.update(dt)
+        for updateable in updatables:
+            updateable.update(dt)
             
-        for roid in asteroid:
-            if roid.isCollidingWith(player):
+        for asteroid in asteroids:
+            if asteroid.isCollidingWith(player):
                 return
+            for shot in shots:
+                if asteroid.isCollidingWith(shot):
+                    asteroid.split()
+                    shot.kill()
 
         screen.fill("black")
 
-        for object in drawable:
-            object.draw(screen)
+        for drawable in drawables:
+            drawable.draw(screen)
 
         pygame.display.flip()
         dt = clock.tick(60) / 1000
