@@ -7,7 +7,7 @@ from asteroidfield import AsteroidField
 def main():
     print("Starting asteroids!")
     runGame()
-    print("Game closed.")
+    print("Game over!")
 
 def runGame():
     pygame.init
@@ -16,9 +16,9 @@ def runGame():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-    asteroids = pygame.sprite.Group()
+    asteroid = pygame.sprite.Group()
     Player.containers = (updatable, drawable)
-    Asteroid.containers = (updatable, drawable)
+    Asteroid.containers = (updatable, drawable, asteroid)
     AsteroidField.containers = (updatable)
 
     asteroid_field = AsteroidField()
@@ -37,6 +37,10 @@ def runGame():
         for object in updatable:
             object.update(dt)
             
+        for roid in asteroid:
+            if roid.isCollidingWith(player):
+                return
+
         screen.fill("black")
 
         for object in drawable:
